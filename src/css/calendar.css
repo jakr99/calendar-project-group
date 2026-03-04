@@ -73,6 +73,65 @@
     min-height: 400px;
 }
 
+.fc {
+    direction: ltr;
+    text-align: left;
+}
+
+.fc button {
+    margin: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    padding: 0.4em 0.6em;
+    line-height: 1.2;
+    font-size: 0.85em;
+}
+
+.fc .fc-button-primary {
+    background-color: #13aa81;
+    color: white;
+    border-radius: 3px;
+}
+
+.fc .fc-button-primary:disabled {
+    opacity: 0.5;
+}
+
+.fc .fc-daygrid-day {
+    border: 1px solid #ddd;
+    min-height: 80px;
+    vertical-align: top;
+    padding: 0.5em;
+}
+
+.fc .fc-daygrid-day-number {
+    float: right;
+    font-weight: bold;
+    margin: 0 0.2em 0 0;
+}
+
+.fc .fc-daygrid-event {
+    background-color: #13aa81;
+    color: white;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    margin-bottom: 0.2em;
+    font-size: 0.8em;
+    cursor: pointer;
+}
+
+.fc .fc-daygrid-event:hover {
+    background-color: #0f8e6b;
+}
+
+#calendar {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -114,6 +173,14 @@
     border-radius: 4px;
 }
 
+.modal select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
 .modal-actions {
     display: flex;
     justify-content: space-between;
@@ -136,10 +203,6 @@
     background-color: #ccc;
 }
 
-.modal select {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+.hidden {
+    display: none;
 }

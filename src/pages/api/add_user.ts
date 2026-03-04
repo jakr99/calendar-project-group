@@ -1,4 +1,3 @@
-import Astro from 'astro';
 import { db } from '../../database/databaseAggregateFunctions';
 import type { APIRoute } from 'astro';
 

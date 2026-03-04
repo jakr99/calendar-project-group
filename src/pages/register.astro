@@ -1,7 +1,94 @@
 ---
-import RegisterComponent from '../components/register.jsx'
-import Navbar from '../components/navbar.jsx';
+import '../css/register.css'
+import Navbar from '../components/navbar.astro'
 ---
 
-<Navbar client:load />
-<RegisterComponent client:load />
+<div class="register-container">
+    <Navbar />
+    <main>
+        <form class="register-form" id="register-form">
+            <h2>Create your SyncUp Account</h2>
+
+            <label for="name">Name</label>
+            <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    required
+            />
+
+            <label for="email">Email</label>
+            <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    required
+            />
+
+            <label for="password">Password</label>
+            <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    required
+            />
+
+            <label for="password_confirmation">Confirm Password</label>
+            <input
+                    type="password"
+                    id="password_confirmation"
+                    name="password_confirmation"
+                    required
+            />
+
+            <button type="submit">Register</button>
+        </form>
+    </main>
+</div>
+
+<script>
+    const registerForm = document.querySelector<HTMLFormElement>('#register-form');
+
+    registerForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formdata = new FormData(registerForm);
+        const data = Object.fromEntries(formdata);
+
+        if (data.password !== data.password_confirmation) {
+            throw new Error("Passwords don't match");
+        }
+
+        const command = {
+            commandId: crypto.randomUUID(),
+            payload: {
+                name: data.name,
+                email: data.email,
+                password: data.password,
+            }
+        };
+
+        try {
+            const result = await fetch('/api/add_user', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(command),
+                credentials: 'include'
+            })
+
+            const response = await result.json();
+
+            if (response.status === "Username taken") {
+                throw new Error("Email already in use");
+            }
+            else {
+                console.log("API response: ", response);
+                globalThis.location.href = '/signin'
+            }
+        }
+        catch (error) {
+            console.error("Failed to send registration command: ", error);
+            throw new Error("Registration failed");
+        }
+    })
+</script>

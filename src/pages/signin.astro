@@ -1,7 +1,84 @@
 ---
-import SigninComponent from '../components/signin.jsx';
-import Navbar from '../components/navbar.jsx';
+import Navbar from '../components/navbar.astro'
+import '../css/signin.css'
 ---
 
-<Navbar client:load />
-<SigninComponent client:load />
+<div class="signin-container">
+    <Navbar />
+    <main>
+        <form class="signin-form" id='signin-form'>
+            <h2>SyncUp</h2>
+            <label for="email">Email</label>
+            <input
+                    type="email"
+                    id="email"
+                    name= "email"
+                    required
+            />
+
+            <label for="password">Password</label>
+            <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    required
+            />
+
+            <button type="submit">Sign In</button>
+
+            <div class="register-link">
+                <button type="button" id="register-link">Register</button>
+            </div>
+        </form>
+    </main>
+</div>
+
+<script>
+    const signinForm = document.querySelector<HTMLFormElement>("#signin-form");
+    const register = document.querySelector<HTMLButtonElement>("#register-link");
+
+    signinForm?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const formdata = new FormData(signinForm);
+        const data = Object.fromEntries(formdata.entries());
+
+        const command = {
+            commandId: crypto.randomUUID(),
+            payload: {
+                email: data.email,
+                password: data.password
+            }
+        }
+
+        try {
+            const result = await fetch('api/find_user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(command),
+                credentials: 'include'
+            })
+
+            const response = await result.json();
+
+            if (response.status === 'accepted') {
+                console.log("Logged in successfully ", response);
+                globalThis.location.href = '/homepage'
+            }
+            else if (response.status === 'already processed') {
+                throw new Error('This Command has already been processed!')
+            }
+            else if (response.error) {
+                throw new Error(response.error)
+            }
+            else {
+                throw new Error('Error occurred while logging in. Please try again later.')
+            }
+        }
+        catch (error) {
+            console.error("Failed to send login command", error)
+        }
+    })
+
+    register?.addEventListener('click', () => {globalThis.location.href = '/register'})
+</script>

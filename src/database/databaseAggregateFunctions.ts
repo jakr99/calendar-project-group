@@ -96,7 +96,9 @@ class DatabaseAggregateFunctions {
   async addOutbox(type: string, aggregateId: number, payload: any, createdAt: string): Promise<void> {
     const sql = "INSERT INTO Outbox (outboxType, AggregateId, Payload, CreatedAt, Processed) VALUES (?, ?, ?, ?, ?)";
     await this.runQuery(sql, [type, aggregateId, JSON.stringify(payload), createdAt, 0]);
-  }
+    }
+
+
   //creates an event with outbox pattern implemented
   async createUserWithOutbox(username: string, password: string, Email: string, commandID: string): Promise<any> {
 
@@ -202,23 +204,6 @@ class DatabaseAggregateFunctions {
     }
   }
 
-  //Adds a new user to the database
-  async addUser(name: string, pass: string): Promise<number | undefined> {
-    // Insert a new user into the Users table
-    const sql = "INSERT INTO Users (username, pass) VALUES (?, ?)";
-    try {
-      const result = await this.runQuery(sql, [name, pass]);
-
-      //console.log(`User ${name} added.`);
-      //console.log(`The User ID is ${result.id}`);
-
-      return (result && (result as any).id) || undefined;
-    }
-    catch (err) {
-      console.error("Error adding User:", err);
-    }
-  }
-
   //adds a new group with that user as a member - complete
   async addGroup(name: string, userID: number): Promise<void> {
     const sqlGroup = "INSERT INTO Groups (Gname) VALUES (?)";
@@ -251,24 +236,6 @@ class DatabaseAggregateFunctions {
       //console.log(`User ${userID} added to Group ${GroupID}.`);
     } catch (err) {
       console.error("Error adding group:", err);
-    }
-  }
-
-  //Adds a new availability to the user - complete
-  async addAvailability(userID: number, startTime: string, endTime: string, Day: number, Month: number, Year: number): Promise<void> {
-    const sqlAvail = "INSERT INTO Availability (Day, Month, AYear, StartTime, EndTime) VALUES (?, ?, ?, ?, ?)";
-    const sqlHas = "INSERT INTO Has (UserID, AvailID) VALUES (?, ?)";
-    try {
-      //Insert the new availability into Availability table
-      const result = await this.runQuery(sqlAvail, [Day, Month, Year, startTime, endTime]);
-      //console.log(`Availability ${result.id} added to the Avail table.`);
-
-      //Insert the mapping of availability and user into Has table
-      await this.runQuery(sqlHas, [userID, result.id]);
-      //console.log(`Availability ${result.id} added to the Has table.`);
-    }
-    catch (err) {
-      console.error("Error Adding Availability:", err);
     }
   }
 
@@ -316,197 +283,6 @@ class DatabaseAggregateFunctions {
     catch (err) {
       console.error("Error adding Calendar:", err);
     }
-  }
-
-  //Adds a new type of Event to the database - complete
-  async addEventType(typeName: string, Eid: number): Promise<void> {
-
-    const sqlType = "INSERT INTO Type (Tname) VALUES (?)";
-    const sqlEventType = "INSERT INTO EventType (TypeID, EventID) VALUES (?, ?)";
-    try {
-      const result = await this.runQuery(sqlType, [typeName]);
-      //console.log(`Type ${typeName} added.`);
-
-      await this.runQuery(sqlEventType, [result.id, Eid]);
-      //console.log(`mapping of Type and Event added`);
-    }
-    catch (err) {
-      console.error("Error adding Type:", err);
-    }
-  }
-
-  //deletes an availability from the database - complete
-  async deleteAvailability(Aid: number): Promise<void> {
-    const sqlDeleteAvail = "DELETE FROM Availability WHERE Aid = ?";
-    const sqlDeleteHas = "DELETE FROM Has WHERE AvailID = ?";
-
-    //wrap all sql commands in a "Packet" so that in the instance of a server crash,
-    //it can rollback to the previous stable state
-    await this.runQuery("BEGIN TRANSACTION");
-    try {
-      //Delete all mappings of this Avail to User from Has table
-      await this.runQuery(sqlDeleteHas, [Aid]);
-      console.log(`Avail ${Aid} Deleted from Has.`);
-
-      //Delete the Avail from Availability table
-      await this.runQuery(sqlDeleteAvail, [Aid]);
-      console.log(`Avail ${Aid} Deleted from Avail.`);
-
-      //end the transaction
-      await this.runQuery("COMMIT");
-    }
-    catch (err) {
-      //roll back the delete if error occured
-      await this.runQuery("ROLLBACK");
-      console.error("Error deleting Type:", err);
-    }
-  }
-
-  //deletes a Type from the database - complete
-  async deleteType(Tid: number): Promise<void> {
-    const sqlDeleteType = "DELETE FROM Type WHERE Tid = ?";
-    const sqlDeleteEType = "DELETE FROM EventType WHERE TypeID = ?";
-
-    //wrap all sql commands in a "Packet" so that in the instance of a server crash,
-    //it can rollback to the previous stable state
-    await this.runQuery("BEGIN TRANSACTION");
-    try {
-      //Delete all mappings of this Type to Events from EventType table
-      await this.runQuery(sqlDeleteEType, [Tid]);
-      console.log(`Type ${Tid} Deleted from EventType.`);
-
-      //Delete the Type from Type table
-      await this.runQuery(sqlDeleteType, [Tid]);
-      console.log(`Type ${Tid} Deleted from Type.`);
-
-      //end the transaction
-      await this.runQuery("COMMIT");
-    }
-    catch (err) {
-      //roll back the delete if error occured
-      await this.runQuery("ROLLBACK");
-      console.error("Error deleting Type:", err);
-    }
-  }
-
-  //Deletes a Group from the database - complete
-  //Also needs to delete all child nodes including, Calandars, Events,
-  //EventCore, EventTime, EventType and their mapping tables in buisiness logic
-  async deleteGroup(GroupID: number): Promise<void> {
-    const sqlDeleteGCal = "DELETE FROM GCal WHERE GroupID = ?";
-    const sqlDeleteGroup = "DELETE FROM Groups WHERE Gid = ?";
-    const sqlDeleteIncluded = "DELETE FROM Included WHERE GroupID = ?";
-
-    await this.runQuery("BEGIN TRANSACTION");
-    try {
-      //Delete all mappings of this group to calendars from GCal table
-      await this.runQuery(sqlDeleteGCal, [GroupID]);
-      console.log(`Group ${GroupID} Deleted from GCal.`);
-
-      //delete all mappings of this group to users from Included table
-      await this.runQuery(sqlDeleteIncluded, [GroupID]);
-      console.log(`Group ${GroupID} Deleted from Included.`);
-
-      //Delete the group from Groups table
-      await this.runQuery(sqlDeleteGroup, [GroupID]);
-      console.log(`Group ${GroupID} Deleted from Groups.`);
-
-      await this.runQuery("COMMIT");
-    }
-    catch (err) {
-      //roll back the delete if error occured
-      await this.runQuery("ROLLBACK");
-      console.error("Error deleting User:", err);
-    }
-
-  }
-
-  //Deletes a user from the database - complete
-  //Also needs to delete all child nodes including Availability during its call stack, 
-  //and possibly groups if they are the only one that is in that group
-  async deleteUser(UserID: number): Promise<void> {
-    const sqlDeleteIncluded = "DELETE FROM Included WHERE UserID = ?";
-    const sqlDeleteUser = "DELETE FROM Users WHERE Uid = ?";
-    const sqlDeleteUHas = "DELETE FROM Has WHERE UserID = ?";
-
-    //wrap all sql commands in a "Packet" so that in the instance of a server crash,
-    //it can rollback to the previous stable state
-    await this.runQuery("BEGIN TRANSACTION");
-    try {
-      //Delete all mappings of this user to groups from Included table
-      await this.runQuery(sqlDeleteIncluded, [UserID]);
-      console.log(`User ${UserID} Deleted from Included.`);
-
-      //Delete the user from Users table
-      await this.runQuery(sqlDeleteUser, [UserID]);
-      console.log(`User ${UserID} Deleted from Users.`);
-
-      //Delete the user mapping from has table
-      await this.runQuery(sqlDeleteUHas, [UserID]);
-      console.log(`User ${UserID} Deleted from Has.`);
-
-      //end the transaction
-      await this.runQuery("COMMIT");
-    }
-    catch (err) {
-      //roll back the delete if error occured
-      await this.runQuery("ROLLBACK");
-      console.error("Error deleting User:", err);
-    }
-  }
-
-  //removes a user's access to a group - Complete
-  async removeUserFromGroup(UserID: number, GroupID: number): Promise<void> {
-    const sqlDeleteIncluded = "DELETE FROM Included WHERE UserID = ? AND GroupID = ?";
-
-    //wrap all sql commands in a "Packet" so that in the instance of a server crash,
-    //it can rollback to the previous stable state
-    await this.runQuery("BEGIN TRANSACTION");
-
-    try {
-      await this.runQuery(sqlDeleteIncluded, [UserID, GroupID]);
-      console.log(`User ${UserID} Deleted from Included.`);
-      //end the transaction
-      await this.runQuery("COMMIT");
-    }
-    catch (err) {
-      //roll back the delete if error occured
-      await this.runQuery("ROLLBACK");
-      console.error("Error deleting include:", err);
-    }
-  }
-
-  //Deletes a calendar from a group - complete
-  async deleteCalendar(groupID: number, calID: number): Promise<void> {
-    const sqlDeleteGCal = "DELETE FROM GCal WHERE (GroupID, CalendarID) = (?, ?)";
-    const sqlDeleteCal = "DELETE FROM Calendar WHERE Cid = ?";
-    const sqlDeleteEventAdded = "DELETE FROM EventAdd WHERE CalendarID = ?";
-
-    //wrap all sql commands in a "Packet" so that in the instance of a server crash,
-    //it can rollback to the previous stable state
-    await this.runQuery("BEGIN TRANSACTION");
-    try {
-      //Delete all mappings of this user to groups from Included table
-      await this.runQuery(sqlDeleteGCal, [groupID, calID]);
-      console.log(`Calendar mapping ${calID} Deleted from GCal.`);
-
-      //Delete the user from Users table
-      await this.runQuery(sqlDeleteCal, [calID]);
-      console.log(`Calendar ${calID} Deleted from Calendar.`);
-
-      //Delete the user from Users table
-      await this.runQuery(sqlDeleteEventAdded, [calID]);
-      console.log(`Calendar mapping ${calID} Deleted from EventAdded.`);
-
-      //end the transaction
-      await this.runQuery("COMMIT");
-    }
-    catch (err) {
-      //roll back the delete if error occured
-      await this.runQuery("ROLLBACK");
-      console.error("Error deleting Calendar:", err);
-    }
-
   }
 
   //Deletes an event from a calendar - Complete

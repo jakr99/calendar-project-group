@@ -1,0 +1,9 @@
+import{R as x,r as f}from"./index.DB02PGg6.js";/* empty css                       */var u={exports:{}},i={};/**
+ * @license React
+ * react-jsx-runtime.production.js
+ *
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */var d;function j(){if(d)return i;d=1;var t=Symbol.for("react.transitional.element"),s=Symbol.for("react.fragment");function o(c,e,n){var a=null;if(n!==void 0&&(a=""+n),e.key!==void 0&&(a=""+e.key),"key"in e){n={};for(var l in e)l!=="key"&&(n[l]=e[l])}else n=e;return e=n.ref,{$$typeof:t,type:c,key:a,ref:e!==void 0?e:null,props:n}}return i.Fragment=s,i.jsx=o,i.jsxs=o,i}var h;function m(){return h||(h=1,u.exports=j()),u.exports}var r=m();const R=()=>{const[t,s]=x.useState(null);f.useEffect(()=>{(async()=>{try{const n=await fetch("/api/get_user",{credentials:"include"}),a=await n.json();n.ok?s(a.data):s(null)}catch(n){console.error("Failed to fetch user: ",n),s(null)}})()},[]);const o=()=>{window.location.href="/signin"},c=async()=>{try{(await fetch("/api/signout",{method:"POST",credentials:"include"})).ok&&(s(null),window.location.href="/")}catch(e){console.error("Sign out failed: ",e)}};return r.jsxs("header",{className:"navbar",children:[r.jsx("div",{className:"brand",children:"SyncUp"}),r.jsxs("nav",{className:"nav-links",children:[r.jsx("a",{href:"/",children:"Home"}),t&&r.jsx("a",{href:"/calendar",children:"Calendar"}),r.jsx("a",{href:"/about",children:"About"}),r.jsx("a",{href:"/contact",children:"Contact"})]}),r.jsx("div",{className:"auth-section",children:t?r.jsxs(r.Fragment,{children:[r.jsxs("span",{className:"user-name",children:["Hello, ",t.username]}),r.jsx("button",{className:"signout",onClick:c,children:"Sign out"})]}):r.jsx("button",{className:"signin",onClick:o,children:"Sign In"})})]})};export{R as N,r as j};

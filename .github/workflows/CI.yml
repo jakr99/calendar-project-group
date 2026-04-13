@@ -3,14 +3,17 @@ name: Continuous Integration
 on:
   pull_request:
   push:
-    branches: [ dev ]
+    branches: [ main, dev ]
 
 jobs:
-  run-tests:
-    name: Build and Test
+  ci:
+    name: Test and Build
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    env:
+      DB_NAME: ./.tmp/ci-test.db
+      ASTRO_TELEMETRY_DISABLED: 1
 
     steps:
       - name: Checkout
@@ -23,34 +26,10 @@ jobs:
           cache: 'npm'
 
       - name: Install Dependencies
-        run: |
-          npm ci
-          npm install --save-dev mocha chai
+        run: npm ci
 
-      - name: Setup Database
-        env:
-          DB_NAME: testdb.db
-        run: node src/database/databaseSetup.js
-      
-      - name: Locate Database Files
-        run: |
-          echo "Current Path: $(pwd)"
-          echo "--- Searching for all .db files ---"
-          find . -name "*.db" -exec ls -lh {} +
-          echo "--- End of search ---"
+      - name: Run Tests
+        run: npm run test:ci
 
-      - name: Run mocha BDD testing
-        id: database-testing
-        env:
-          DB_NAME: testdb.db
-        run: |
-          npm test
-          
-      - name: Run Script-based tests
-        env:
-          DB_NAME: testdb.db
-        run: |
-          npx tsx Testing/test_schema.ts
-          npx tsx Testing/runQuery_test.ts
-          npx tsx Testing/getQuery_test.ts
-          npx tsx Testing/outbox_test.ts
+      - name: Run Production Build
+        run: npm run build

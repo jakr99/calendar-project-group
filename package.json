@@ -7,7 +7,9 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "test": "mocha --node-option import=tsx 'test/**/*.ts'"
+    "test": "mocha --node-option import=tsx --file test/setup.ts 'test/**/*.spec.ts'",
+    "test:ci": "npm test",
+    "ci": "npm run test:ci && ASTRO_TELEMETRY_DISABLED=1 npm run build"
   },
   "dependencies": {
     "@astrojs/react": "^4.4.2",
@@ -31,6 +33,7 @@
     "ws": "^8.18.3"
   },
   "devDependencies": {
+    "@astrojs/node": "^9.5.1",
     "@types/chai": "^5.2.3",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",

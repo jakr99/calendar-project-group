@@ -1,6 +1,6 @@
 # SyncUp
 ### Team members
-**Drake Hoffmann William Thomsen Ian Heathcote**
+**Drake Hoffmann William Thomsen Ian Heathcote Jacob Lee**
 
 ## Project Description
 ### Introduction

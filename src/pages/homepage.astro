@@ -1,7 +1,46 @@
 ---
-import HomePageComponent from '../components/homepage.jsx'
-import Navbar from '../components/navbar.jsx';
+import Navbar from '../components/navbar.astro'
+import '../css/homepage.css'
 ---
 
-<Navbar client:load />
-<HomePageComponent client:load />
+<div class="homepage-container">
+    <Navbar />
+    <main>
+        <header class="homepage-header">
+            <h1>Welcome to SyncUp</h1>
+            <p>Plan together. Find time. Stay organized.</p>
+            <button class="getStarted" id="get-started">Get Started</button>
+        </header>
+
+        <section class="homepage-content">
+            <h2>Introduction</h2>
+            <p>
+                SyncUp helps groups overcome scheduling conflicts and issues by identifying shared availability.
+                Whether you're planning your next project meeting or looking to gather the family for an event, SyncUp has the customizable solution for you!
+            </p>
+        </section>
+
+        <section class="homepage-content">
+            <h2>Features</h2>
+            <p><strong>Including:</strong></p>
+            <ul class="services">
+                <li class="service-item">Personal calendar editing & saving</li>
+                <li class="service-item">Sharing/syncing with others</li>
+                <li class="service-item">Grouping for managers or large families</li>
+                <li class="service-item">Share full event details and notes</li>
+                <li class="service-item">Get notifications about RSVPs and event times</li>
+            </ul>
+            <p><strong>Not including</strong></p>
+            <ul class="services">
+                <li class="service-item">We won't share your location or personal data</li>
+                <li class="service-item">Going to your events for you (We know. We dont want to see your mother in law either).</li>
+            </ul>
+        </section>
+    </main>
+</div>
+
+<script>
+    const redirect = document.querySelector<HTMLButtonElement>('#get-started');
+
+    redirect?.addEventListener('click', () => {globalThis.location.href='/register'})
+</script>

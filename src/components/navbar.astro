@@ -1,0 +1,80 @@
+---
+import '../css/navbar.css';
+---
+
+<header class="navbar">
+    <div class="brand">SyncUp</div>
+
+    <nav class="nav-links">
+        <a href="/">Home</a>
+        <a id="calendar-link" href="/calendar" style="display: none;">Calendar</a>
+        <a href="/about">About</a>
+        <a href="/contact">Contact</a>
+    </nav>
+
+    <div class="auth-section">
+        <span id="user-name" style="display: none;"></span>
+        <button class="signin" id="signin-btn">Sign In</button>
+        <button class="signout" id="signout-btn" style="display: none;">Sign Out</button>
+    </div>
+</header>
+
+<script type="module">
+    const userNameEl = document.getElementById('user-name');
+    const signinBtn = document.getElementById('signin-btn');
+    const signoutBtn = document.getElementById('signout-btn');
+    const calendarLink = document.getElementById('calendar-link');
+
+    // Fetch user info
+    async function fetchUser() {
+        try {
+            const res = await fetch('/api/get_user', { credentials: 'include' });
+            const data = await res.json();
+            if (res.ok && data.data) {
+                const user = data.data;
+                userNameEl.textContent = `Hello, ${user.username}`;
+                userNameEl.style.display = 'inline-block';
+                signoutBtn.style.display = 'inline-block';
+                signinBtn.style.display = 'none';
+                calendarLink.style.display = 'inline-block';
+            } else {
+                signinBtn.style.display = 'inline-block';
+                signoutBtn.style.display = 'none';
+                userNameEl.style.display = 'none';
+                calendarLink.style.display = 'none';
+            }
+        } catch (err) {
+            console.error('Failed to fetch user:', err);
+            signinBtn.style.display = 'inline-block';
+            signoutBtn.style.display = 'none';
+            userNameEl.style.display = 'none';
+            calendarLink.style.display = 'none';
+        }
+    }
+
+    fetchUser();
+
+    // Sign in
+    signinBtn.addEventListener('click', () => {
+        window.location.href = '/signin';
+    });
+
+    // Sign out
+    signoutBtn.addEventListener('click', async () => {
+        try {
+            const res = await fetch('/api/signout', {
+                method: 'POST',
+                credentials: 'include',
+            });
+            if (res.ok) {
+                userNameEl.style.display = 'none';
+                signoutBtn.style.display = 'none';
+                signinBtn.style.display = 'inline-block';
+                calendarLink.style.display = 'none';
+                window.location.href = '/';
+            }
+        } catch (err) {
+            console.error('Sign out failed:', err);
+        }
+    });
+</script>

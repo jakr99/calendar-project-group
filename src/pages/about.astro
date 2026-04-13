@@ -1,7 +1,75 @@
 ---
-import AboutComponent from '../components/about.jsx'
-import Navbar from '../components/navbar.jsx'
+import Navbar from '../components/navbar.astro'
+import '../css/about.css'
 ---
+<div class="about-container">
+    <Navbar />
+    <main>
+        <header class="about-header">
+            <h1>About SyncUp</h1>
+            <p>Plan together. Find time. Stay organized.</p>
+        </header>
 
-<Navbar client:load />
-<AboutComponent client:load />
+        <section class="about-section">
+            <h2>Team Members</h2>
+            <ul>
+                <li>William Thomsen - Team Lead</li>
+                <li>Drake Hoffman - API/Backend Dev</li>
+                <li>Henrique Sousa - Frontend Dev</li>
+                <li>Jacob Lee - Fullstack Dev/QA</li>
+                <li>Kai Blair - Fullstack Dev/QA</li>
+                <li>Ian Heathcote - Frontend Dev/API</li>
+            </ul>
+        </section>
+
+        <section class="about-section">
+            <h2>Project Description</h2>
+            <p>
+                SyncUp addresses the challenge of scheduling conflicts when planning events or meeting. Whether coordinating with friends or colleagues, or app simplifies planning by identifying shared availability.
+            </p>
+        </section>
+
+        <section class="about-section">
+            <h2>Objectives</h2>
+            <ul>
+                <li>Store and edit dates of important events or deadlines</li>
+                <li>Create and sync group calendars</li>
+                <li>Add timeframes for each day</li>
+            </ul>
+        </section>
+
+        <section class="about-section">
+            <h2>Scope</h2>
+            <p><strong>This app includes:</strong></p>
+            <ul>
+                <li>Personal calendar editing and saving</li>
+                <li>Sharing/syncing with others</li>
+                <li>Categories: Work, Class, Personal, etc.</li>
+                <li>Option to share full event content or just "busy" status</li>
+            </ul>
+            <p><strong>This app will never include:</strong></p>
+            <ul>
+                <li>GPS/location sharing</li>
+                <li>Messaging</li>
+                <li>LLMs</li>
+            </ul>
+        </section>
+
+        <section class="about-section">
+            <h2>Proposed Solution</h2>
+            <p>
+                SyncUp is a simple calendar logging system that helps users create and manage events. By syncing group calendars, it enables collaboration planning. The web-based app uses a small database to track users and their groups, making it ideal for families, friend group, and small projects. With sqlite3, it also functions well as a personal calendar.
+            </p>
+        </section>
+
+        <section class="about-section">
+            <h2>Technology Strack</h2>
+            <ul>
+                <li>ReactJS</li>
+                <li>NodeJS</li>
+                <li>Astro framework</li>
+                <li>sqlite3</li>
+            </ul>
+        </section>
+    </main>
+</div>
